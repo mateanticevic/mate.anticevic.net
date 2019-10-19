@@ -35,7 +35,7 @@ class IndexPage extends React.Component<{}, State> {
 
         connection.start().then(function () {
             console.log("connected");
-        });
+        }).catch(d => alert(JSON.stringify(d)));
 
         connection.on("Receive", (tracking, message) => {
             this.setState({
@@ -58,7 +58,12 @@ class IndexPage extends React.Component<{}, State> {
                 center={this.state.center}
                 zoom={this.state.zoom}>
                 {this.state.currentLocation &&
-                    <Marker key={1} position={{ lat: this.state.currentLocation.latitude, lng: this.state.currentLocation.longitude }} title="Current location" />
+                    <Marker
+                        key={1}
+                        icon="me.png"
+                        position={{ lat: this.state.currentLocation.latitude, lng: this.state.currentLocation.longitude }}
+                        title="Current location"
+                    />
                 }
             </Map>
         );

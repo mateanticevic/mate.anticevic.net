@@ -4,6 +4,7 @@
   "description": "mate.anticevic.net",
   "main": "index.js",
   "scripts": {
+    "build": "parcel build ./src/index.html",
     "dev": "parcel ./src/index.html --port 8080",
     "start": "dev",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -18,10 +19,16 @@
     "url": "https://github.com/mateanticevic/mate.anticevic.net/issues"
   },
   "homepage": "https://github.com/mateanticevic/mate.anticevic.net#readme",
+  "staticFiles": {
+    "staticPath": "public",
+    "watcherGlob": "**"
+  },
   "dependencies": {
     "@microsoft/signalr": "^3.0.0",
+    "assets": "^3.0.1",
     "index": "^0.4.0",
     "parcel": "^1.12.4",
+    "parcel-plugin-static-files-copy": "^2.2.1",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
     "react-google-maps": "^9.4.5",
