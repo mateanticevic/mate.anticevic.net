@@ -1,0 +1,32 @@
+{
+  "name": "mate-anticevic-net",
+  "version": "0.1.0",
+  "description": "mate.anticevic.net",
+  "main": "index.js",
+  "scripts": {
+    "dev": "parcel ./src/index.html",
+    "start": "dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mateanticevic/mate.anticevic.net.git"
+  },
+  "author": "Mate Antičević",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mateanticevic/mate.anticevic.net/issues"
+  },
+  "homepage": "https://github.com/mateanticevic/mate.anticevic.net#readme",
+  "dependencies": {
+    "index": "^0.4.0",
+    "parcel": "^1.12.4",
+    "react": "^16.10.2",
+    "react-dom": "^16.10.2",
+    "react-google-maps": "^9.4.5",
+    "typescript": "^3.6.4"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.9"
+  }
+}
