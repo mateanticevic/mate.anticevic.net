@@ -3,8 +3,10 @@ import { GoogleMap, withGoogleMap } from 'react-google-maps';
 
 const GoogleMaps = withGoogleMap((props) => (
     <GoogleMap
+        center={props.center}
         defaultCenter={{ lat: 0, lng: 0 }}
-        defaultZoom={10}
+        defaultZoom={3}
+        zoom={props.zoom}
         options={{
             zoomControl: false,
             mapTypeControl: false,
