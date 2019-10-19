@@ -8,6 +8,7 @@ import { Location } from './types/app';
 type State = {
     center: any,
     currentLocation?: Location,
+    isMoving: boolean,
     zoom: number,
 }
 
@@ -16,14 +17,15 @@ class IndexPage extends React.Component<{}, State> {
     state: State = {
         center: { lat: 0, lng: 0 },
         currentLocation: undefined,
+        isMoving: false,
         zoom: 3
     }
 
     componentDidMount() {
-        fetch("http://api.anticevic.net/tracking/latest?username=mate").then(x => x.json()).then(r => {
+        fetch("https://api.anticevic.net/tracking/latest?username=mate").then(x => x.json()).then(r => {
             this.setState({
                 center: { lat: r.Latitude, lng: r.Longitude },
-                currentLocation: { latitude: r.Latitude, longitude: r.Longitude },
+                currentLocation: { latitude: r.Latitude, longitude: r.Longitude, speed: r.Speed },
                 zoom: 12
             });
         });
@@ -35,7 +37,7 @@ class IndexPage extends React.Component<{}, State> {
 
         connection.start().then(function () {
             console.log("connected");
-        }).catch(d => alert(JSON.stringify(d)));
+        });
 
         connection.on("Receive", (tracking, message) => {
             this.setState({
@@ -45,22 +47,36 @@ class IndexPage extends React.Component<{}, State> {
                 },
                 currentLocation: {
                     latitude: tracking.latitude,
-                    longitude: tracking.longitude
+                    longitude: tracking.longitude,
+                    speed: tracking.speed
                 },
+                isMoving: true,
                 zoom: 15
             });
         });
     }
 
     render() {
+
+        const labelText = this.state.isMoving ? `${Math.ceil(3.6 * this.state.currentLocation!.speed)} km/h` : ' ';
+
         return (
             <Map
                 center={this.state.center}
                 zoom={this.state.zoom}>
                 {this.state.currentLocation &&
                     <Marker
-                        key={1}
-                        icon="me.png"
+                        icon={{
+                            url:"me.png",
+                            labelOrigin: {
+                                x: 120,
+                                y: 25
+                            }
+                        }}
+                        label={{
+                            text: labelText,
+                            fontSize: '30px'
+                        }}
                         position={{ lat: this.state.currentLocation.latitude, lng: this.state.currentLocation.longitude }}
                         title="Current location"
                     />
