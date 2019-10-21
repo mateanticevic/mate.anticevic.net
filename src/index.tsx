@@ -1,6 +1,6 @@
 import React from 'react';
 import Map from './components/Map';
-import * as signalR from '@microsoft/signalr';
+import { LogLevel, HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { Marker } from 'react-google-maps';
 
 import { Location } from './types/app';
@@ -14,11 +14,22 @@ type State = {
 
 class IndexPage extends React.Component<{}, State> {
 
+    connection: HubConnection;
+
     state: State = {
         center: { lat: 0, lng: 0 },
         currentLocation: undefined,
         isMoving: false,
         zoom: 3
+    }
+
+    constructor() {
+        super();
+
+        this.connection = new HubConnectionBuilder()
+            .withUrl("https://hub.anticevic.net/TrackingHub")
+            .configureLogging(LogLevel.Information)
+            .build();
     }
 
     componentDidMount() {
@@ -30,16 +41,9 @@ class IndexPage extends React.Component<{}, State> {
             });
         });
 
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl("http://do.anticevic.net:5001/TrackingHub")
-            .configureLogging(signalR.LogLevel.Information)
-            .build();
+        this.connection.start();
 
-        connection.start().then(function () {
-            console.log("connected");
-        });
-
-        connection.on("Receive", (tracking, message) => {
+        this.connection.on("Receive", tracking => {
             this.setState({
                 center: {
                     lat: tracking.latitude,
@@ -58,16 +62,18 @@ class IndexPage extends React.Component<{}, State> {
 
     render() {
 
-        const labelText = this.state.isMoving ? `${Math.ceil(3.6 * this.state.currentLocation!.speed)} km/h` : ' ';
+        const { center, currentLocation, isMoving, zoom } = this.state;
+
+        const labelText = isMoving ? `${Math.ceil(3.6 * currentLocation!.speed)} km/h` : ' ';
 
         return (
             <Map
-                center={this.state.center}
-                zoom={this.state.zoom}>
-                {this.state.currentLocation &&
+                center={center}
+                zoom={zoom}>
+                {currentLocation &&
                     <Marker
                         icon={{
-                            url:"me.png",
+                            url: "me.png",
                             labelOrigin: {
                                 x: 120,
                                 y: 25
@@ -77,7 +83,7 @@ class IndexPage extends React.Component<{}, State> {
                             text: labelText,
                             fontSize: '30px'
                         }}
-                        position={{ lat: this.state.currentLocation.latitude, lng: this.state.currentLocation.longitude }}
+                        position={{ lat: currentLocation.latitude, lng: currentLocation.longitude }}
                         title="Current location"
                     />
                 }
