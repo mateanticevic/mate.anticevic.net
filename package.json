@@ -2,7 +2,7 @@
   "name": "mate-anticevic-net",
   "version": "1.0.0",
   "description": "mate.anticevic.net",
-  "main": "index.js",
+  "main": "index.html",
   "scripts": {
     "build": "parcel build ./src/index.html",
     "dev": "parcel ./src/index.html --port 8080",
