@@ -21,7 +21,6 @@ class IndexPage extends React.Component<{}, State> {
 
     state: State = {
         center: { lat: 0, lng: 0 },
-        currentLocation: undefined,
         isMoving: false,
         zoom: 3
     }
@@ -51,24 +50,29 @@ class IndexPage extends React.Component<{}, State> {
         const labelText = isMoving ? `${Math.ceil(3.6 * currentLocation!.speed)} km/h` : ' ';
 
         return (
-            <Map
-                center={center}
-                zoom={zoom}>
-                {currentLocation &&
-                    <Marker
-                        icon={{
-                            url: "https://cdn-icons-png.flaticon.com/256/0/14.png",
-                            scaledSize: new google.maps.Size(30, 30),
-                        }}
-                        label={{
-                            text: labelText,
-                            fontSize: '30px'
-                        }}
-                        position={{ lat: currentLocation.latitude, lng: currentLocation.longitude }}
-                        title="Current location"
-                    />
-                }
-            </Map>
+            <React.Fragment>
+                <Map
+                    center={center}
+                    zoom={zoom}>
+                    {currentLocation &&
+                        <Marker
+                            icon={{
+                                url: "https://cdn-icons-png.flaticon.com/256/0/14.png",
+                                scaledSize: new google.maps.Size(30, 30),
+                            }}
+                            label={{
+                                text: labelText,
+                                fontSize: '30px'
+                            }}
+                            position={{ lat: currentLocation.latitude, lng: currentLocation.longitude }}
+                            title="Current location"
+                        />
+                    }
+                </Map>
+                <div className={`page-loader ${currentLocation ? 'active' : ''}`}>
+                    <div className="loader-spinner"></div>
+                </div>
+            </React.Fragment>
         );
     }
 }
