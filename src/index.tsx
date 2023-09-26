@@ -41,7 +41,7 @@ class IndexPage extends React.Component<{}, State> {
                     speed: tracking.speed
                 },
                 isMoving: false,
-                zoom: 15
+                zoom: 17
             });
         });
     }
@@ -57,11 +57,8 @@ class IndexPage extends React.Component<{}, State> {
                 {currentLocation &&
                     <Marker
                         icon={{
-                            url: "me.png",
-                            labelOrigin: {
-                                x: 120,
-                                y: 25
-                            }
+                            url: "https://cdn-icons-png.flaticon.com/256/0/14.png",
+                            scaledSize: new google.maps.Size(30, 30),
                         }}
                         label={{
                             text: labelText,

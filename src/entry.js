@@ -1,6 +1,7 @@
 import React from 'react';
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import IndexPage from './index';
 
-render(<IndexPage />, document.getElementById('app'));
+const root = createRoot(document.getElementById('app'));
+root.render(<IndexPage />);
