@@ -1,12 +1,17 @@
 import { default as React } from 'react';
-import { GoogleMap, withGoogleMap } from 'react-google-maps';
+import { GoogleMap } from '@react-google-maps/api';
 
-const GoogleMaps = withGoogleMap((props) => (
+export type MapProps = {
+    center?: google.maps.LatLngLiteral;
+    zoom?: number;
+    children?: React.ReactNode;
+};
+
+const GoogleMaps = ({ center = { lat: 0, lng: 0 }, zoom = 3, children }: MapProps) => (
     <GoogleMap
-        center={props.center}
-        defaultCenter={{ lat: 0, lng: 0 }}
-        defaultZoom={3}
-        zoom={props.zoom}
+        center={center}
+        zoom={zoom}
+        mapContainerStyle={{ width: '100%', height: '100%' }}
         options={{
             zoomControl: false,
             mapTypeControl: false,
@@ -15,8 +20,8 @@ const GoogleMaps = withGoogleMap((props) => (
             rotateControl: false,
             fullscreenControl: false
         }}>
-        {props.children}
+        {children}
     </GoogleMap>
-));
+);
 
 export default GoogleMaps;

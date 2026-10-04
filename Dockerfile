@@ -1,8 +1,8 @@
-FROM node:20 as builder
+FROM node:26 AS builder
 
 COPY package.json package-lock.json ./
 
-RUN npm install --legacy-peer-deps && mkdir /build && mv ./node_modules ./build
+RUN npm ci && mkdir /build && mv ./node_modules ./build
 
 WORKDIR /build
 

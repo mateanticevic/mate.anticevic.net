@@ -1,7 +1,7 @@
 import React from 'react';
 import Map from './components/Map';
 import { LogLevel, HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
-import { Marker } from 'react-google-maps';
+import { MarkerF } from '@react-google-maps/api';
 
 import { Location } from './types/app';
 
@@ -55,7 +55,7 @@ class IndexPage extends React.Component<{}, State> {
                     center={center}
                     zoom={zoom}>
                     {currentLocation &&
-                        <Marker
+                        <MarkerF
                             icon={{
                                 url: "https://cdn-icons-png.flaticon.com/256/0/14.png",
                                 scaledSize: new google.maps.Size(30, 30),
