@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { PolylineF, useGoogleMap } from '@react-google-maps/api';
 import Map from './components/Map';
+import Box from '@mui/material/Box';
+import TrackingStats, { parseTimestamp, TrackingPoint } from './components/TrackingStats';
 
 function TrackingPolyline({ paths }: { paths: google.maps.LatLngLiteral[] }) {
     const map = useGoogleMap();
@@ -21,7 +23,7 @@ function TrackingPolyline({ paths }: { paths: google.maps.LatLngLiteral[] }) {
 }
 
 export default function ViewPage({ viewId }: { viewId: string }) {
-    const [paths, setPaths] = useState<google.maps.LatLngLiteral[]>([]);
+    const [paths, setPaths] = useState<TrackingPoint[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -48,7 +50,12 @@ export default function ViewPage({ viewId }: { viewId: string }) {
                     return typeof lat === 'number' && typeof lng === 'number'
                         && Number.isFinite(lat) && Number.isFinite(lng)
                         && Math.abs(lat) <= 90 && Math.abs(lng) <= 180
-                        ? [{ lat, lng }] : [];
+                        ? [{ lat, lng,
+                            timestamp: parseTimestamp(tracking.timestamp ?? tracking.dateTime
+                                ?? tracking.recordedAt ?? tracking.date ?? tracking.createdAt ?? tracking.time),
+                            speed: typeof tracking.speed === 'number' && Number.isFinite(tracking.speed)
+                                && tracking.speed >= 0 ? tracking.speed : null,
+                        }] : [];
                 });
                 if (!controller.signal.aborted) {
                     setPaths(points);
@@ -67,13 +74,16 @@ export default function ViewPage({ viewId }: { viewId: string }) {
         return () => controller.abort();
     }, [viewId]);
 
-    return <>
-        <Map>
-            {paths.length > 0 && <TrackingPolyline paths={paths} />}
-        </Map>
+    return <Box sx={{ height: { xs: '100dvh', sm: '100%' }, display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ flex: 1, minHeight: 0 }}>
+            <Map>
+                {paths.length > 0 && <TrackingPolyline paths={paths} />}
+            </Map>
+        </Box>
+        {!loading && !error && paths.length > 0 && <TrackingStats points={paths} />}
         {loading && <div className="page-loader" role="status" aria-label="Loading tracking view">
             <div className="loader-spinner" />
         </div>}
         {error && <div className="view-message" role="alert">{error}</div>}
-    </>;
+    </Box>;
 }

@@ -14,7 +14,7 @@
     "type": "git",
     "url": "git+https://github.com/mateanticevic/mate.anticevic.net.git"
   },
-  "author": "Mate Anti\u010devi\u0107",
+  "author": "Mate Antičević",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/mateanticevic/mate.anticevic.net/issues"
@@ -24,7 +24,10 @@
     "staticPath": "public"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@microsoft/signalr": "10.0.11",
+    "@mui/material": "^9.4.0",
     "@react-google-maps/api": "2.20.8",
     "assets": "3.0.1",
     "index": "0.4.0",
