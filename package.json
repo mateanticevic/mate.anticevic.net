@@ -4,6 +4,7 @@
   "description": "mate.anticevic.net",
   "scripts": {
     "build": "parcel build ./src/index.html",
+    "watch": "parcel watch ./src/index.html --dist-dir dist --public-url /",
     "dev": "parcel ./src/index.html --port 8080",
     "start": "npm run dev",
     "test": "npm run typecheck",
