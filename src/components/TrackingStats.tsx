@@ -32,6 +32,57 @@ function distanceKm(points: TrackingPoint[]): number {
     }, 0);
 }
 
+function elevationGainMeters(points: TrackingPoint[]): number | null {
+    const ordered = points.every(point => point.timestamp !== null)
+        ? [...points].sort((a, b) => a.timestamp! - b.timestamp!) : points;
+    const climbThreshold = 10;
+    let gain: number | null = null;
+
+    function addSegment(elevations: number[]) {
+        if (elevations.length < 2) return;
+        // A three-sample median removes isolated spikes. Repeat the endpoint
+        // at each edge to preserve the start and finish of gradual climbs.
+        const smoothed = elevations.map((elevation, index) => [
+            elevations[Math.max(0, index - 1)], elevation,
+            elevations[Math.min(elevations.length - 1, index + 1)],
+        ].sort((a, b) => a - b)[1]);
+        let valley = smoothed[0];
+        let peak = valley;
+        let climbing = false;
+        gain = gain ?? 0;
+        for (const elevation of smoothed.slice(1)) {
+            if (!climbing) {
+                valley = Math.min(valley, elevation);
+                if (elevation - valley >= climbThreshold) {
+                    climbing = true;
+                    peak = elevation;
+                }
+            } else {
+                peak = Math.max(peak, elevation);
+                // Only a meaningful descent ends a climb; small dips are noise.
+                if (peak - elevation >= climbThreshold) {
+                    gain += peak - valley;
+                    climbing = false;
+                    valley = elevation;
+                }
+            }
+        }
+        if (climbing) gain += peak - valley;
+    }
+
+    let segment: number[] = [];
+    for (const point of ordered) {
+        if (point.elevation === null || !Number.isFinite(point.elevation)) {
+            addSegment(segment);
+            segment = [];
+        } else {
+            segment.push(point.elevation);
+        }
+    }
+    addSegment(segment);
+    return gain;
+}
+
 export default function TrackingStats({ points }: { points: TrackingPoint[] }) {
     const chartPoints = useMemo(() => points
         .filter((point): point is TrackingPoint & { timestamp: number } => point.timestamp !== null)
@@ -43,6 +94,7 @@ export default function TrackingStats({ points }: { points: TrackingPoint[] }) {
     const maxSpeed = speeds.length ? speeds.reduce((a, b) => Math.max(a, b)) * 3.6 : null;
     const avgSpeed = speeds.length && points.length
         ? speeds.reduce((sum, speed) => sum + speed, 0) / points.length * 3.6 : null;
+    const elevationGain = useMemo(() => elevationGainMeters(points), [points]);
     const seconds = from !== null && to !== null ? Math.floor((to - from) / 1000) : null;
     const duration = seconds === null ? 'Unavailable'
         : `${Math.floor(seconds / 3600)}h ${Math.floor(seconds % 3600 / 60)}m ${seconds % 60}s`;
@@ -55,6 +107,7 @@ export default function TrackingStats({ points }: { points: TrackingPoint[] }) {
         ['Max speed', maxSpeed === null ? 'Unavailable' : `${maxSpeed.toFixed(1)} km/h`],
         ['Distance (approx.)', `${distanceKm(points).toFixed(2)} km`],
         ['Avg speed', avgSpeed === null ? 'Unavailable' : `${avgSpeed.toFixed(1)} km/h`],
+        ['Total elevation gain', elevationGain === null ? 'Unavailable' : `${elevationGain.toFixed(1)} m`],
     ];
 
     return <Card component="section" aria-label="Tracking statistics" elevation={4} sx={{
