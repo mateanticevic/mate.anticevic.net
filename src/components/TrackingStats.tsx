@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
+import TrackingLineChart from './TrackingLineChart';
 
 export type TrackingPoint = google.maps.LatLngLiteral & {
     timestamp: number | null;
     speed: number | null;
+    elevation: number | null;
 };
 
 export function parseTimestamp(value: unknown): number | null {
@@ -31,6 +33,9 @@ function distanceKm(points: TrackingPoint[]): number {
 }
 
 export default function TrackingStats({ points }: { points: TrackingPoint[] }) {
+    const chartPoints = useMemo(() => points
+        .filter((point): point is TrackingPoint & { timestamp: number } => point.timestamp !== null)
+        .slice().sort((a, b) => a.timestamp - b.timestamp), [points]);
     const times = points.flatMap(point => point.timestamp === null ? [] : [point.timestamp]);
     const from = times.length ? times.reduce((a, b) => Math.min(a, b)) : null;
     const to = times.length ? times.reduce((a, b) => Math.max(a, b)) : null;
@@ -83,6 +88,16 @@ export default function TrackingStats({ points }: { points: TrackingPoint[] }) {
                         <Typography component="dd" variant="body1" sx={{ m: 0, fontWeight: 600 }}>{value}</Typography>
                     </Box>)}
                 </Box>
+            </Box>
+            <Divider sx={{ my: 2 }} />
+            <Box sx={{ display: 'grid', gap: 2 }}>
+                <TrackingLineChart title="Elevation" unit="m" color="#2e7d32"
+                    samples={chartPoints.map(point => ({ timestamp: point.timestamp, value: point.elevation }))}
+                    from={from} to={to} />
+                <TrackingLineChart title="Speed" unit="km/h" color="#1976d2"
+                    samples={chartPoints.map(point => ({ timestamp: point.timestamp,
+                        value: point.speed === null ? null : point.speed * 3.6 }))}
+                    from={from} to={to} />
             </Box>
         </CardContent>
     </Card>;

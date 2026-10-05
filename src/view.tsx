@@ -55,6 +55,8 @@ export default function ViewPage({ viewId }: { viewId: string }) {
                                 ?? tracking.recordedAt ?? tracking.date ?? tracking.createdAt ?? tracking.time),
                             speed: typeof tracking.speed === 'number' && Number.isFinite(tracking.speed)
                                 && tracking.speed >= 0 ? tracking.speed : null,
+                            elevation: [tracking.elevation, tracking.altitude].find(value =>
+                                typeof value === 'number' && Number.isFinite(value)) ?? null,
                         }] : [];
                 });
                 if (!controller.signal.aborted) {
